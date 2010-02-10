@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<table xmlns="http://query.yahooapis.com/v1/schema/table.xsd">
+    <meta>
+        <author>Erik Eldridge</author>
+        <description>
+        </description>
+        <sampleQuery></sampleQuery>
+    </meta>
+    <bindings>
+        <select produces="XML">
+            <inputs>
+                <key id="path" type="xs:string" paramType="variable"/>
+                <key id="contents" type="xs:string" paramType="variable"/>
+            </inputs>
+            <execute><![CDATA[
+                response.object = function () {
+                    
+                    //fetch 'files'
+                    var queries = [],
+                        results = [];
+                        
+                    //put queries and results in arrays so we can reuse the var w/o overwriting values
+                    queries[0] = 'select * from yql.storage where name="store://FOUBAHrTP9vFVB2k8E2jEE"',
+                    results[0] = y.xmlToJson(y.query(query).results);
+                    
+                    y.include('http://test.erikeldridge.com/yql/json2.js');
+                    
+                    if (results[0].results.result.value[path]) {
+                        
+                        results[0].results.result.value[path] = contents;
+
+                        queries[1] = "update yql.storage set value='{json}' where name='{update}'"
+                            .replace('{json}', JSON.stringify(results[0].results.result.value))
+                            .replace('{update}', 'store://FOUBAHrTP9vFVB2k8E2jEE'),
+                        results[1] = y.xmlToJson(y.query(query).results);
+                        
+                        return { 
+                           "headers" : {                        
+                               "HTTP/1.1 status" : 204,
+                               "Date" : new Date(),
+                               "Location" : "/webdav/" + path,
+                               "Content-Length" : 0,
+                               "Connection" : "close",
+                               "Content-Type" : "text/plain; charset=UTF-8"
+                           }
+                        }
+                    }
+                    
+                    results[0].results.result.value[path] = contents;
+                    
+                    queries[1] = "update yql.storage set value='{json}' where name='{update}'"
+                        .replace('{json}', JSON.stringify(results[0].results.result.value))
+                        .replace('{update}', 'store://FOUBAHrTP9vFVB2k8E2jEE'),
+                    results[1] = y.xmlToJson(y.query(query).results);
+                    
+                    return {
+                        headers : {
+                            "HTTP/1.1 status" : "201",
+                            "Date" : new Date(),
+                            "Location" : '/webdav/' + path,
+                            "Content-Length" : contents.length,
+                            "Connection" : "close",
+                            "Content-Type" : "text/plain; charset=UTF-8"
+                        }
+                    };
+                }();
+            ]]></execute>
+        </select>
+    </bindings>
+</table>
