@@ -5,6 +5,7 @@
             handleComplete = function (id, o, args) {
                 var json = Y.JSON.parse(o.responseText);
                 Y.Cookie.set('openid-assoc', json.query.results.result.assoc);
+                Y.log( json.query.results.result.assoc );
             },
             uri = "http://query.yahooapis.com/v1/public/yql?q=use%20'http%3A%2F%2F"+domain+"%2Fyql%2Fopenid.assoc.xml%3Fq%3D15'%20as%20table%3B%20select%20*%20from%20table%20where%20uri%20%3D%20'https%3A%2F%2Fopen.login.yahooapis.com%2Fopenid%2Fop%2Fauth'&format=json&diagnostics=false&callback=",
             ioConfig = {
@@ -19,7 +20,7 @@
             xdrConfig = {
                 id:'flash',
                 yid: Y.id, 
-                src:'../../io.swf'
+                src:'../../../../io.swf'
             };
             
             Y.io.transport(xdrConfig);
