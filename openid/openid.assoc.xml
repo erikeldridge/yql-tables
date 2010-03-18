@@ -11,54 +11,52 @@
     <bindings>
         <select produces="JSON">
             <inputs>
-            
+
                 <!-- uri must be a valid auth uri -->
                 <key id="uri" type="xs:string" paramType="variable" required="true"/>
-                
+
             </inputs>
             <execute><![CDATA[
-                
                 //use a wrapper fn so we can exit early, ie as a workaround for lack of exit(), die(), etc
-                var wrapper = function () {
+                response.object = function () {
                         
-                        var params = {
-                                'openid.ns' : 'http://specs.openid.net/auth/2.0',
-                                'openid.mode' : 'associate',
-                                'openid.assoc_type' : 'HMAC-SHA1',
-                                'openid.session_type' : 'no-encryption'
-                            },
-                            pairs = [];
+                     var params = {
+                             'openid.ns' : 'http://specs.openid.net/auth/2.0',
+                             'openid.mode' : 'associate',
+                             'openid.assoc_type' : 'HMAC-SHA1',
+                             'openid.session_type' : 'no-encryption'
+                         },
+                         pairs = [];
 
-                        for (var key in params) {
-                            pairs.push(key + '=' + encodeURIComponent(params[key]));
-                        }
-                        
-                        y.include('http://github.com/kvz/phpjs/raw/master/functions/strings/trim.js');
-                        
-                        var assocUri = uri + '?' + pairs.join('&'),
-                            resp = y.rest(assocUri).get().response,
-                            assoc = trim(resp, '\n').split('\n');
-                            
+                     for (var key in params) {
+                         pairs.push(key + '=' + encodeURIComponent(params[key]));
+                     }
+
+                     y.include('http://github.com/kvz/phpjs/raw/master/functions/strings/trim.js');
+
+                     var assocUri = uri + '?' + pairs.join('&'),
+                         resp = y.rest(assocUri).get().response;
+                         
+                     if (!resp) {
                         return {
-                            "status" : "success",
-                            "assoc" : assoc
+                            "error" : "no response"
                         };
-                    
-                    }();
-                    
-                //output
-                if ('success' === wrapper.status) {
-                    response.object = {
-                        "status" : "success",
-                        "assoc" : wrapper.assoc
-                    };
-                } else {
-                    response.object = {
-                        "status" : "error",
-                        "details" : wrapper.details
-                    };
-                }
-                
+                     }
+                     
+                     var arr = trim(resp).split('\n'),
+                         assoc = {};
+                         
+                     for( var i in arr ){
+                        var pair = arr[i].split(':');
+                        assoc[pair[0]] = pair[1];
+                     }
+                     
+                     return {
+                         "success" : assoc
+                     };
+
+                 }();
+
             ]]></execute>
         </select>
     </bindings>
