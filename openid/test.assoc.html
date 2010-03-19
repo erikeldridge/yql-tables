@@ -11,14 +11,17 @@
 
         }
     } ).use('io', 'gallery-storage-lite', function (Y) {
-        var domain='example.com',
+        var githubAcct ='erikeldridge',
             handleComplete = function (id, o, args) {
-                Y.StorageLite.on('storage-lite:ready', function () {
+                //storage lite rocks! http://yuilibrary.com/gallery/show/storage-lite
+                Y.StorageLite.on('storage-lite:ready', function () {Y.log( o.responseText );
+                    Y.StorageLite.removeItem( 'openid-assoc' );
                     Y.StorageLite.setItem( 'openid-assoc', o.responseText );
                 });
-                Y.log(Y.StorageLite.getItem('openid-assoc', true));
+                var json = Y.StorageLite.getItem( 'openid-assoc', true);
+                Y.log( json );
             },
-            uri = "http://query.yahooapis.com/v1/public/yql?q=use%20'http%3A%2F%2F"+domain+"%2Fyql%2Fopenid.assoc.xml%3Fq%3D15'%20as%20table%3B%20select%20*%20from%20table%20where%20uri%20%3D%20'https%3A%2F%2Fopen.login.yahooapis.com%2Fopenid%2Fop%2Fauth'&format=json&diagnostics=false&callback=",
+            uri = "http://query.yahooapis.com/v1/public/yql?q=use%20'http%3A%2F%2Fgithub.com%2F"+githubAcct+"%2Fyql-tables%2Fraw%2Fmaster%2Fopenid%2Fopenid.assoc.xml'%20as%20table%3B%20select%20*%20from%20table%20where%20uri%20%3D%20'https%3A%2F%2Fopen.login.yahooapis.com%2Fopenid%2Fop%2Fauth'&format=json&diagnostics=false&callback=",
             ioConfig = {
                 method: 'GET',
                 on: {
