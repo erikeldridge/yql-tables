@@ -11,44 +11,21 @@
         <select produces="JSON">
             <inputs>
 				<key id="localUrl" type="xs:string" paramType="variable" required="true"/>
-                <key id="assertion" type="xs:string" paramType="variable" required="true"/>
-				<key id="assoc_json" type="xs:string" paramType="variable"/>
+                <key id="assertJson" type="xs:string" paramType="variable" required="true"/>
+				<key id="assocJson" type="xs:string" paramType="variable"/>
 				<key id="nonceStoreUri" type="xs:string" paramType="variable"/>
             </inputs>
             <execute><![CDATA[
-                if (!String.prototype.supplant){
-                   String.prototype.supplant = function (o) {
-                       return this.replace(/{([^{}]*)}/g,
-                           function (a, b) {
-                               var r = o[b];
-                               return typeof r === 'string' || typeof r === 'number' ? r : a;
-                           }
-                       );
-                   };
-                }
-                if (!String.prototype.trim) {
-                   String.prototype.trim = function () {
-                       return this.replace(/^\s+|\s+$/g, "");
-                   };
-                }
-                if ( !String.prototype.parseQuery ) {
-                   String.prototype.parseQuery = function () {
-                       var bag = {},
-                           items = null;
-                       for each ( var pair in this.split('&') ) {
-                           items = pair.split('=');
-                           bag[items[0]] = items[1];
-                       }
-                       return bag;
-                   };
-                }
 				
-				y.include('http://decafbad.com/hgwebdir.cgi/S3Ajax/raw-file/7006d3de0ce0/js/sha1.js');
+				//credit: http://javascript.crockford.com/remedial.html
+				if(!String.prototype.supplant){String.prototype.supplant=function(o){return this.replace(/{([^{}]*)}/g,function(a,b){var r=o[b];return typeof r==='string'||typeof r==='number'?r:a;});};}if(!String.prototype.trim){String.prototype.trim=function(){return this.replace(/^\s+|\s+$/g,"");};}
 				
+				y.include('http://example.com/json2.js');
+										
                 response.object = function() {
 
                     //1) Verifying the Return URL (http://openid.net/specs/openid-authentication-2_0.html#verify_return_to)
-					assertion = assertion.parseQuery();
+					assertion = JSON.parse( assertJson );
 					
                     //note: this doesn't validate query parameters in return_to
                     if ( assertion['openid.return_to'].trim() !== localUrl ) {
@@ -131,17 +108,36 @@
 
 					// 4) verify signatures (http://openid.net/specs/openid-authentication-2_0.html#verifying_signatures)
 					var serialized = '';
-					for each ( var key in assertion['openid.signed'].split( ',' ) ) {y.log(key);
-						serialized += '{key}:{value}\n'.supplant( {
-							key : 'openid.'+key, 
+					for each ( var key in assertion['openid.signed'].split( ',' ).sort() ) {
+						serialized += "{key}:{value}\n".supplant( {
+							key : key, 
 							value : assertion[ 'openid.'+key ]
 						} );
 					}
 					
-					assoc = JSON.parse( assoc_json );
+					assoc = JSON.parse( assocJson );
 					
-					if ( 'HMAC-SHA1' === assoc['assoc_type'] ) {
-						var sig = y.crypto.encodeBase64( y.crypto.encodeHmacSha1( assoc['mac_key'], serialized ) ); 
+					//note: I haven't been able to reproduce the sig yet
+					if ( 'HMAC-SHA1' === assoc['assoc_type'] ) { 
+						
+						//paj's: http://decafbad.com/hgwebdir.cgi/S3Ajax/raw-file/7006d3de0ce0/js/sha1.js
+						y.include('http://example.com/paj_hmac_sha1.js');
+						var secret = y.crypto.decodeBase64( assoc['mac_key'] );
+						var sig = b64_hmac_sha1( secret, serialized );y.log(sig);
+						
+						// yql native: http://developer.yahoo.com/yql/guide/yql-javascript-objects.html#yql-execute-crypto
+						var secret = y.crypto.decodeBase64( assoc['mac_key'] );
+						var sig = y.crypto.encodeBase64( y.crypto.encodeHmacSHA1( secret, serialized ) );y.log(sig);
+						
+						//crypto-js: http://code.google.com/p/crypto-js/
+						//host crypto on your own domain, define Crypto = {} above everything & remove d=window.Crypto={}
+						y.include('http://example.com/2.0.0-crypto-sha1.js');
+						
+						y.include('http://crypto-js.googlecode.com/files/2.0.0-hmac-min.js');
+						var secret = Crypto.charenc.Binary.bytesToString( Crypto.util.base64ToBytes( assoc['mac_key'] ) );
+						var hmac = Crypto.HMAC( Crypto.SHA1, serialized, secret, { asBytes: true } );
+						var sig = Crypto.util.bytesToBase64( hmac );y.log(sig);
+						
                     } else {
 						return { "error" : "hmac-sha1 is only supported at this time" };
 					}
