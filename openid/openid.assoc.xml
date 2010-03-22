@@ -6,18 +6,20 @@
             - generate an openid association for caller to store
             - For more info see http://openid.net/specs/openid-authentication-2_0.html#associations
         </description>
+		<!-- yahoo -->
         <sampleQuery>select * from {table} where uri="https://open.login.yahooapis.com/openid/op/auth"</sampleQuery>
+		<!-- google -->
+		<!-- select * from {table} where uri="https://www.google.com/accounts/o8/ud" -->
     </meta>
     <bindings>
         <select produces="JSON">
             <inputs>
 
-                <!-- uri must be a valid auth uri -->
+                <!-- uri must be a valid auth uri. get auth endpoint by running openid.xml w/o assoc -->
                 <key id="uri" type="xs:string" paramType="variable" required="true"/>
 
             </inputs>
             <execute><![CDATA[
-                //use a wrapper fn so we can exit early, ie as a workaround for lack of exit(), die(), etc
                 response.object = function () {
                         
                      var params = {
