@@ -20,7 +20,7 @@
                 <key id="return_to" type="xs:string" paramType="variable" required="true"/>
 
 				<!-- 
-					a json array of attribute exchange (http://axschema.org) fields, eg 
+					json array of attr exchange (http://axschema.org, http://openid.net/specs/openid-attribute-exchange-1_0.html) fields, eg 
 					[{'schema':'http://axschema.org/contact/email','alias':'email','required':true},
                 	{'schema':'http://axschema.org/namePerson','alias':'fullname','required':true}]
 				-->
