@@ -3,15 +3,22 @@
     <meta>
         <author>Erik Eldridge</author>
         <description>
+<<<<<<< HEAD:openid/openid.verify.xml
             fetch an XRDS document via yadis.  For more info see
             http://openid.net/specs/openid-authentication-2_0.html#discovery
             http://yadis.org/wiki/Main_Page
         </description>
         <sampleQuery>select * from {table} where uri="http://www.yahoo.com/"</sampleQuery>
+=======
+            verify positive assertion.  For more info see http://openid.net/specs/openid-authentication-2_0.html#verification
+        </description>
+        <sampleQuery>select * from {table} where request="{request to RP}" and host="{RP host}"</sampleQuery>
+>>>>>>> be51172c6f682a07e720bb301c06c1ce58ac5f99:openid/openid.verify.xml
     </meta>
     <bindings>
         <select produces="JSON">
             <inputs>
+<<<<<<< HEAD:openid/openid.verify.xml
                 <key id="opReturnTo" type="xs:string" paramType="variable" required="true"/>
                 <key id="uri" type="xs:string" paramType="variable" required="true"/>
             </inputs>
@@ -67,6 +74,146 @@
                     };
                 }              
                   
+=======
+				<key id="localUrl" type="xs:string" paramType="variable" required="true"/>
+                <key id="assertJson" type="xs:string" paramType="variable" required="true"/>
+				<key id="assocJson" type="xs:string" paramType="variable"/>
+				<key id="nonceStoreUri" type="xs:string" paramType="variable"/>
+            </inputs>
+            <execute><![CDATA[
+				
+				//credit: http://javascript.crockford.com/remedial.html
+				if(!String.prototype.supplant){String.prototype.supplant=function(o){return this.replace(/{([^{}]*)}/g,function(a,b){var r=o[b];return typeof r==='string'||typeof r==='number'?r:a;});};}if(!String.prototype.trim){String.prototype.trim=function(){return this.replace(/^\s+|\s+$/g,"");};}
+				
+				y.include('http://example.com/json2.js');
+										
+                response.object = function() {
+
+                    //1) Verifying the Return URL (http://openid.net/specs/openid-authentication-2_0.html#verify_return_to)
+					assertion = JSON.parse( assertJson );
+					
+                    //note: this doesn't validate query parameters in return_to
+                    if ( assertion['openid.return_to'].trim() !== localUrl ) {
+                        return { "error" : "return_to url doesn't match local url" };
+                    }
+					
+                    //2) Verifying Discovered Information
+                    
+                    //perform disco on the Claimed Id 
+                    //try yadis
+                    var claimedId = assertion['openid.claimed_id'].split('#')[0],
+						githubAcct = 'erikeldridge',
+                        yadisYql = 'use "{yadisTableUri}" as yadis; select * from yadis where uri = "{claimedId}"'.supplant( {
+							yadisTableUri : 'http://github.com/'+githubAcct+'/yql-tables/raw/master/openid/openid.yadis.xml',
+							claimedId : claimedId
+						} ),
+                        yadisResults = y.xmlToJson( y.query( yadisYql ).results );
+                    
+                    if ( yadisResults.results.result && 'success' === yadisResults.results.result.status ) {
+						
+                        //if xrds, the protocol version, OP Endpoint URL & 
+                        //the OP-Local Identifier (if different than the Claimed Identifier) 
+                        //MUST be present in one <xrd:Service> element.
+                        
+                        var xrdsQuery = 'select * from xml where url="{url}"'.supplant({
+								url : yadisResults.results.result.uri,
+							} ),
+                            xrdsResults = y.xmlToJson( y.query( xrdsQuery ).results ),
+                            protocolVerified = false;
+                        
+                        //check protocol
+                        assertion['openid.ns'] = assertion['openid.ns'].trim();
+                        for each(var type in xrdsResults.results.XRDS.XRD.Service.Type) {
+                            if (-1 !== type.indexOf( assertion['openid.ns'] ) ) {
+                                protocolVerified = true;
+                                break;
+                            }
+                        }
+						
+                        if ( !protocolVerified ) {
+                            return { "error" : "Discovered protocol version doesn't match one in assertion" };
+                        }
+                            
+                        //check if protocol and op endpoint are in the same service element
+                        if ( !xrdsResults.results.XRDS.XRD.Service.URI ) {
+                            return { "error" : "OP Endpoint URL MUST be present in one <xrd:Service>" };
+                        }
+
+                        var opEndpointUri = xrdsResults.results.XRDS.XRD.Service.URI;
+                    } else {
+
+                        //try html                    
+                        var htmlYql = 'select * from html where url="{claimedId}" and xpath=\'//link[@rel="openid2.provider"]\''.supplant( {
+							claimedId : claimedId
+						} ),
+                            htmlResults = y.xmlToJson( y.query( htmlYql ).results );
+                        if ( htmlResults.results ) {
+                            var opEndpointUri = htmlResults.results.link.href;
+                        }
+                    }
+
+                    if ( !opEndpointUri ) {
+                        return { "error" : "discovery failed; no op endpoint uri found" };
+                    } else if ( opEndpointUri !== assertion['openid.op_endpoint'] ) {
+                        return { "error" : "passed op endpoint != discovered op endpoint" };
+                    }
+					
+					// 3) verify nonce (http://openid.net/specs/openid-authentication-2_0.html#verify_nonce)
+					// note: this is just a stub to check a remote nonce db
+					if ( nonceStoreUri ) {
+						nonceYql = 'select * from json where url = "{uri}/{nonce}"'.supplant( {
+							uri : nonceStoreUri,
+							nonce : assertion.response_nonce
+						} ) 
+						nonceResults = y.xmlToJson( y.query( nonceYql ).results );
+						if ( !nonceResults.success ) {
+							return { "error": "invalid nonce" };
+						}
+					}	
+
+					// 4) verify signatures (http://openid.net/specs/openid-authentication-2_0.html#verifying_signatures)
+					var serialized = '';
+					for each ( var key in assertion['openid.signed'].split( ',' ).sort() ) {
+						serialized += "{key}:{value}\n".supplant( {
+							key : key, 
+							value : assertion[ 'openid.'+key ]
+						} );
+					}
+					
+					assoc = JSON.parse( assocJson );
+					
+					//note: I haven't been able to reproduce the sig yet
+					if ( 'HMAC-SHA1' === assoc['assoc_type'] ) { 
+						
+						//paj's: http://decafbad.com/hgwebdir.cgi/S3Ajax/raw-file/7006d3de0ce0/js/sha1.js
+						y.include('http://example.com/paj_hmac_sha1.js');
+						var secret = y.crypto.decodeBase64( assoc['mac_key'] );
+						var sig = b64_hmac_sha1( secret, serialized );y.log(sig);
+						
+						// yql native: http://developer.yahoo.com/yql/guide/yql-javascript-objects.html#yql-execute-crypto
+						var secret = y.crypto.decodeBase64( assoc['mac_key'] );
+						var sig = y.crypto.encodeBase64( y.crypto.encodeHmacSHA1( secret, serialized ) );y.log(sig);
+						
+						//crypto-js: http://code.google.com/p/crypto-js/
+						//host crypto on your own domain, define Crypto = {} above everything & remove d=window.Crypto={}
+						y.include('http://example.com/2.0.0-crypto-sha1.js');
+						
+						y.include('http://crypto-js.googlecode.com/files/2.0.0-hmac-min.js');
+						var secret = Crypto.charenc.Binary.bytesToString( Crypto.util.base64ToBytes( assoc['mac_key'] ) );
+						var hmac = Crypto.HMAC( Crypto.SHA1, serialized, secret, { asBytes: true } );
+						var sig = Crypto.util.bytesToBase64( hmac );y.log(sig);
+						
+                    } else {
+						return { "error" : "hmac-sha1 is only supported at this time" };
+					}
+					
+					if ( sig !== assertion['openid.sig'] ) {
+						return { "error" : "signatures do not match" };
+					}
+					
+					return { "success": ":)" };
+                }();
+>>>>>>> be51172c6f682a07e720bb301c06c1ce58ac5f99:openid/openid.verify.xml
             ]]></execute>
         </select>
     </bindings>

@@ -20,7 +20,6 @@
                 
                 //set this domain to your base uri for testing 
                 var domain = 'http://github.com/erikeldridge/yql-tables/raw/master/openid',
-                
                     normalize = function (id) {
                         var tableUri = domain+'/openid.normalize.xml',                    
                             query = 'use "'+tableUri+'" as norm; '
@@ -39,7 +38,7 @@
                         var yadisTableUri = domain+'/openid.yadis.xml?r=5',
                             yadisQuery = 'use "'+yadisTableUri+'" as yadis; '
                                 + 'select * from yadis where uri = "'+normId+'"',
-                            yadisResults = y.xmlToJson(y.query(yadisQuery).results);y.log(yadisResults);
+                            yadisResults = y.xmlToJson(y.query(yadisQuery).results);
                         
                         //results.result only shows up for success responses. not sure why
                         if (yadisResults.results.result 
@@ -59,22 +58,17 @@
                         
                         //ok, yadis and html fail, so give up
                         return false;                    
-                    },
-                    
-                    asociate (authUri) {
-                        
-                    },
+                    };
                     
                     //use a wrapper fn so we can exit early, ie as a workaround for lack of exit(), die(), etc
-                    wrapper = function (id) {
+                    response.object = function () {
                     
                         //normalize id
                         var normId = normalize(id);
                     
                         if (!normId) {
                             return {
-                                'status' : 'error',
-                                'details' : 'invalid id'
+                                'error' : 'invalid id'
                             };
                         }
                     
@@ -83,27 +77,21 @@
                     
                         if (!baseUri) {
                             return {
-                                'status' : 'error',
-                                'details' : 'id could not be resolved to an openid provider'
+                                'error' : 'id could not be resolved to an openid provider'
                             };
                         }
-                        
-                        //create association
-                        var assoc = associate();
                         
                         //validate return_to and extract realm url
                         var pattern = '^([^:?#/]+'  //scheme
                                 + ':\/\/'           //separator
                                 +'[^:?#/]+)',       //domain
-
                             match = return_to.match(new RegExp(pattern));
 
                         if (match) {
                             var realm = match[0];
                         } else {
                             return {
-                                'status' : 'error',
-                                'details' : 'invalid return_to uri'
+                                'error' : 'invalid return_to uri'
                             };
                         }                      
                         
@@ -116,38 +104,20 @@
                                 'openid.identity' : 'http://specs.openid.net/auth/2.0/identifier_select',
                                 'openid.claimed_id' : 'http://specs.openid.net/auth/2.0/identifier_select'
                             },
-
                             pairs = [];
-                        
-                        
+                     
                         if (assoc_handle) {
                             params['openid.assoc_handle'] = assoc_handle;
                         }
                         
                         for (var key in params) {
-                            pairs.push(key + '=' + encodeURIComponent(params[key]));
+                            pairs.push(key + '=' + encodeURIComponent( params[key] ) );
                         }
                     
                         return {
-                            "status" : "success",
-                            "uri" : baseUri + '?' + pairs.join('&')
+                            "success" : baseUri + '?' + pairs.join('&')
                         };
-                    
-                    }(id);
-                    
-                //output
-                if ('success' === wrapper.status) {
-                    response.object = {
-                        "status" : "success",
-                        "uri" : wrapper.uri
-                    };
-                } else {
-                    response.object = {
-                        "status" : "error",
-                        "details" : wrapper.details
-                    };
-                }
-                
+                    }();                
             ]]></execute>
         </select>
     </bindings>
