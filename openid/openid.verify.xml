@@ -1,80 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <table xmlns="http://query.yahooapis.com/v1/schema/table.xsd">
     <meta>
-        <author>Erik Eldridge</author>
+        <author>Erik Eldridge w/ help from Yu Wang</author>
         <description>
-<<<<<<< HEAD:openid/openid.verify.xml
-            fetch an XRDS document via yadis.  For more info see
-            http://openid.net/specs/openid-authentication-2_0.html#discovery
-            http://yadis.org/wiki/Main_Page
-        </description>
-        <sampleQuery>select * from {table} where uri="http://www.yahoo.com/"</sampleQuery>
-=======
-            verify positive assertion.  For more info see http://openid.net/specs/openid-authentication-2_0.html#verification
+			verify positive assertion.  For more info see http://openid.net/specs/openid-authentication-2_0.html#verification
         </description>
         <sampleQuery>select * from {table} where request="{request to RP}" and host="{RP host}"</sampleQuery>
->>>>>>> be51172c6f682a07e720bb301c06c1ce58ac5f99:openid/openid.verify.xml
     </meta>
     <bindings>
         <select produces="JSON">
             <inputs>
-<<<<<<< HEAD:openid/openid.verify.xml
-                <key id="opReturnTo" type="xs:string" paramType="variable" required="true"/>
-                <key id="uri" type="xs:string" paramType="variable" required="true"/>
-            </inputs>
-            <execute><![CDATA[
-                    
-                
-                var getXrdsUri = function (yadisUri) {
-
-                        if (-1 !== yadisUri.indexOf('google')) {
-                        
-                            //google's header uri points at a doc for portable contacts, so use one from
-                            //http://code.google.com/apis/accounts/docs/OpenID.html#endpoint
-                            return 'https://www.google.com/accounts/o8/id';
-                        }
-                        
-                        //initiate (http://yadis.org/wiki/Yadis_1.0_%28HTML%29#6.2.4_Initiation)
-                        var req = y.rest(yadisUri),
-                            resp = req.accept('application/xrds+xml').get();
-                        
-                        if (resp.headers) {
-                            
-                            //yadis 6.2.5 #3
-                            if (resp.headers['x-xrds-location']) {
-                                return resp.headers['x-xrds-location'];
-                            } 
-                            
-                            //yadis 6.2.5 #4
-                            if (-1 !== resp.headers['content-type'].indexOf('application/xrds+xml')) {
-                                return yadisUri;
-                            }
-                        } 
-                        
-                        //yadis 6.2.5 #1
-                        //use yql's html parser because we don't have html string parser for resp.response :(
-                        var query = 'select * from html where url="'+yadisUri+'" '
-                                + 'and xpath=\'//meta[@http-equiv="X-XRDS-Location"]\'',
-                            results = y.xmlToJson(y.query(query).results);
-                    
-                        if (results.results) {
-                            return results.results.meta.content;
-                        }                    
-                    },
-                    xrdsUri = getXrdsUri(uri);
-                    
-                if (xrdsUri) {
-                    response.object = {
-                        "status" : "success",
-                        "uri" : xrdsUri
-                    };
-                } else {
-                    response.object = {
-                        "status" : "error"
-                    };
-                }              
-                  
-=======
 				<key id="localUrl" type="xs:string" paramType="variable" required="true"/>
                 <key id="assertJson" type="xs:string" paramType="variable" required="true"/>
 				<key id="assocJson" type="xs:string" paramType="variable"/>
@@ -85,12 +20,14 @@
 				//credit: http://javascript.crockford.com/remedial.html
 				if(!String.prototype.supplant){String.prototype.supplant=function(o){return this.replace(/{([^{}]*)}/g,function(a,b){var r=o[b];return typeof r==='string'||typeof r==='number'?r:a;});};}if(!String.prototype.trim){String.prototype.trim=function(){return this.replace(/^\s+|\s+$/g,"");};}
 				
-				y.include('http://example.com/json2.js');
+				y.include('http://test.erikeldridge.com/yql/json2.js');
+				y.include('http://test.erikeldridge.com/yql/2.0.0-crypto-sha1.js');
+				y.include('http://crypto-js.googlecode.com/files/2.0.0-hmac-min.js');
 										
                 response.object = function() {
 
                     //1) Verifying the Return URL (http://openid.net/specs/openid-authentication-2_0.html#verify_return_to)
-					assertion = JSON.parse( assertJson );
+					assertion = JSON.parse( decodeURIComponent( assertJson ) );
 					
                     //note: this doesn't validate query parameters in return_to
                     if ( assertion['openid.return_to'].trim() !== localUrl ) {
@@ -151,7 +88,7 @@
                             var opEndpointUri = htmlResults.results.link.href;
                         }
                     }
-
+ 
                     if ( !opEndpointUri ) {
                         return { "error" : "discovery failed; no op endpoint uri found" };
                     } else if ( opEndpointUri !== assertion['openid.op_endpoint'] ) {
@@ -172,40 +109,34 @@
 					}	
 
 					// 4) verify signatures (http://openid.net/specs/openid-authentication-2_0.html#verifying_signatures)
-					var serialized = '';
-					for each ( var key in assertion['openid.signed'].split( ',' ).sort() ) {
-						serialized += "{key}:{value}\n".supplant( {
-							key : key, 
-							value : assertion[ 'openid.'+key ]
-						} );
+					var message = '';
+					for each ( var key in assertion['openid.signed'].split( ',' ) ) {
+						message += key+':'+assertion[ 'openid.'+key ]+'\n';
 					}
+					var assoc = JSON.parse( assocJson ); 
 					
-					assoc = JSON.parse( assocJson );
+					y.include('http://test.erikeldridge.com/yql/2.0.0-crypto-sha1.js');
+					y.include('http://crypto-js.googlecode.com/files/2.0.0-hmac-min.js');
 					
-					//note: I haven't been able to reproduce the sig yet
-					if ( 'HMAC-SHA1' === assoc['assoc_type'] ) { 
-						
-						//paj's: http://decafbad.com/hgwebdir.cgi/S3Ajax/raw-file/7006d3de0ce0/js/sha1.js
-						y.include('http://example.com/paj_hmac_sha1.js');
-						var secret = y.crypto.decodeBase64( assoc['mac_key'] );
-						var sig = b64_hmac_sha1( secret, serialized );y.log(sig);
-						
-						// yql native: http://developer.yahoo.com/yql/guide/yql-javascript-objects.html#yql-execute-crypto
-						var secret = y.crypto.decodeBase64( assoc['mac_key'] );
-						var sig = y.crypto.encodeBase64( y.crypto.encodeHmacSHA1( secret, serialized ) );y.log(sig);
-						
-						//crypto-js: http://code.google.com/p/crypto-js/
-						//host crypto on your own domain, define Crypto = {} above everything & remove d=window.Crypto={}
-						y.include('http://example.com/2.0.0-crypto-sha1.js');
-						
-						y.include('http://crypto-js.googlecode.com/files/2.0.0-hmac-min.js');
-						var secret = Crypto.charenc.Binary.bytesToString( Crypto.util.base64ToBytes( assoc['mac_key'] ) );
-						var hmac = Crypto.HMAC( Crypto.SHA1, serialized, secret, { asBytes: true } );
-						var sig = Crypto.util.bytesToBase64( hmac );y.log(sig);
-						
+					if ( 'no-encryption' === assoc['session_type'] && 'HMAC-SHA1' === assoc['assoc_type'] ) { 
+						raw_signature = Crypto.HMAC(
+							Crypto.SHA1, 
+							message, 
+							Crypto.util.base64ToBytes( assoc['mac_key'] ), 
+							{ asBytes: true }
+						);						
+					} else if ( 'no-encryption' === assoc['session_type'] && 'HMAC-SHA256' === assoc['assoc_type'] ) { 
+						raw_signature = Crypto.HMAC(
+							Crypto.SHA256, 
+							message, 
+							Crypto.util.base64ToBytes( assoc['mac_key'] ), 
+							{ asBytes: true }
+						);
                     } else {
-						return { "error" : "hmac-sha1 is only supported at this time" };
+						return { "error" : "only no-encryption w/ sha1 or sha256 is supported at this time" };
 					}
+					
+					var sig = Crypto.util.bytesToBase64( raw_signature );
 					
 					if ( sig !== assertion['openid.sig'] ) {
 						return { "error" : "signatures do not match" };
@@ -213,7 +144,6 @@
 					
 					return { "success": ":)" };
                 }();
->>>>>>> be51172c6f682a07e720bb301c06c1ce58ac5f99:openid/openid.verify.xml
             ]]></execute>
         </select>
     </bindings>
