@@ -21,7 +21,17 @@
                 var json = Y.StorageLite.getItem( 'openid-assoc', true);
                 Y.log( json );
             },
-            uri = "http://query.yahooapis.com/v1/public/yql?q=use%20'http%3A%2F%2Fgithub.com%2F"+githubAcct+"%2Fyql-tables%2Fraw%2Fmaster%2Fopenid%2Fopenid.assoc.xml'%20as%20table%3B%20select%20*%20from%20table%20where%20uri%20%3D%20'https%3A%2F%2Fopen.login.yahooapis.com%2Fopenid%2Fop%2Fauth'&format=json&diagnostics=false&callback=",
+            params = [
+                'q='+encodeURIComponent('use "http://github.com/'+githubAcct+'/yql-tables/raw/master/openid/openid.assoc.xml" as table; '
+                    + 'select * from table where '
+                    + 'uri="https://open.login.yahooapis.com/openid/op/auth"'
+                ),
+                'callback=',
+                'diagnostics=false',
+                'format=json',
+                'debug=true'
+            ],
+            uri = "http://query.yahooapis.com/v1/public/yql?"+params.join('&'),
             ioConfig = {
                 method: 'GET',
                 on: {
@@ -42,5 +52,5 @@
             Y.on('io:xdrReady', function () {
                 Y.io(uri, ioConfig);
             });
-    });
+    });//http://query.yahooapis.com/v1/public/yql?q=use%20%22http%3A%2F%2Fgithub.com%2Ferikeldridge%2Fyql-tables%2Fraw%2Fmaster%2Fopenid%2Fopenid.assoc.xml%22%20as%20table%3B%20select%20*%20from%20table%20where%20uri%3D%22https%3A%2F%2Fopen.login.yahooapis.com%2Fopenid%2Fop%2Fauth%22%20and%20&callback=&diagnostics=false&format=json&debug=true
 </script>
