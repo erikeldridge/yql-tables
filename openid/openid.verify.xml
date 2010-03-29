@@ -25,13 +25,11 @@
 				y.include('http://crypto-js.googlecode.com/files/2.0.0-hmac-min.js');
 										
                 response.object = function() {
-
-                    //1) Verifying the Return URL (http://openid.net/specs/openid-authentication-2_0.html#verify_return_to)
 					assertion = JSON.parse( decodeURIComponent( assertJson ) );
 					
                     //note: this doesn't validate query parameters in return_to
                     if ( assertion['openid.return_to'].trim() !== localUrl ) {
-                        return { "error" : "return_to url doesn't match local url" };
+                        return { "error" : "return_to url ("+assertion['openid.return_to']+") doesn't match local url ("+localUrl+")" };
                     }
 					
                     //2) Verifying Discovered Information
@@ -111,12 +109,10 @@
 					// 4) verify signatures (http://openid.net/specs/openid-authentication-2_0.html#verifying_signatures)
 					var message = '';
 					for each ( var key in assertion['openid.signed'].split( ',' ) ) {
-						message += key+':'+assertion[ 'openid.'+key ]+'\n';
+						message += key+':'+assertion[ 'openid.'+key ]+'\n'; 
 					}
-					var assoc = JSON.parse( assocJson ); 
 					
-					y.include('http://test.erikeldridge.com/yql/2.0.0-crypto-sha1.js');
-					y.include('http://crypto-js.googlecode.com/files/2.0.0-hmac-min.js');
+					var assoc = JSON.parse( decodeURIComponent( assocJson ) ); 
 					
 					if ( 'no-encryption' === assoc['session_type'] && 'HMAC-SHA1' === assoc['assoc_type'] ) { 
 						raw_signature = Crypto.HMAC(
