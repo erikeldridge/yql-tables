@@ -17,8 +17,6 @@
 
                 <!-- uri must be a valid auth uri. get auth endpoint by running openid.xml w/o assoc -->
                 <key id="uri" type="xs:string" paramType="variable" required="true"/>
-
-				<key id="assocStoreuri" type="xs:string" paramType="variable" />
 				
             </inputs>
             <execute><![CDATA[
@@ -61,19 +59,9 @@
 						assoc[pair[0]] = pair[1];
 					}
 
-					if (assocStoreuri) {
-						assocStoreuri += y.crypto.encodeMd5(assoc);
-						var resp = y.rest(assocStoreuri).contentType('application/x-www-form-urlencoded').query({
-							'value': JSON.stringify( assoc )
-						}).post().response
-						return {
-							"success": resp.trim()
-						};
-					} else {
-						return {
-							"success": assoc
-						};
-					}
+					return {
+						"success": assoc
+					};
 				} ();
 
 
