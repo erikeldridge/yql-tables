@@ -16,6 +16,7 @@ function handleIoComplete (id, o, args) {
 	Y.Node.get('#openid').set('href', json.query.results.success);
 }
 
+
 function parseQueryString (string) {
     var params = string.split( '&' ),
         pairs = {};
@@ -28,6 +29,7 @@ function parseQueryString (string) {
 
 function handleStorageReady () {
 	var localUrl = document.location.href.substr( 0, document.location.href.indexOf('?') ),
+	    nonceStoreUri = 'http://example.com/nonces/',
 	    assocJson = encodeURIComponent( Y.JSON.stringify( Y.StorageLite.getItem('openid-assoc', true).query.results.success ) ),
 	    assertJson = encodeURIComponent( 
 	        Y.JSON.stringify( 
@@ -38,7 +40,8 @@ function handleStorageReady () {
 		    
 		    // for some reason, using @param w/ json results in json.parse error in yql, so pass json in query string
 		    'q=' + encodeURIComponent('use "http://test.erikeldridge.com/yql/openid/openid.verify.xml" as table;'
-		        +"select * from table where assocJson='"+assocJson+"' and assertJson='"+assertJson+"' and localUrl='"+localUrl+"'"
+		        +"select * from table where assocJson='"+assocJson+"' and assertJson='"+assertJson
+		        +"' and localUrl='"+localUrl+"' and nonceStoreUri='"+nonceStoreUri+"'"
             ), 
             
             'callback=', 
