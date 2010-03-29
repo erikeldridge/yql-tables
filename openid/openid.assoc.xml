@@ -18,46 +18,64 @@
                 <!-- uri must be a valid auth uri. get auth endpoint by running openid.xml w/o assoc -->
                 <key id="uri" type="xs:string" paramType="variable" required="true"/>
 
+				<key id="assocStoreuri" type="xs:string" paramType="variable" />
+				
             </inputs>
             <execute><![CDATA[
-                response.object = function () {
-                        
-                     var params = {
-                             'openid.ns' : 'http://specs.openid.net/auth/2.0',
-                             'openid.mode' : 'associate',
-                             'openid.assoc_type' : 'HMAC-SHA1',
-                             'openid.session_type' : 'no-encryption'
-                         },
-                         pairs = [];
 
-                     for (var key in params) {
-                         pairs.push(key + '=' + encodeURIComponent(params[key]));
-                     }
+				//credit: http://javascript.crockford.com/remedial.html
+				if(!String.prototype.supplant){String.prototype.supplant=function(o){return this.replace(/{([^{}]*)}/g,function(a,b){var r=o[b];return typeof r==='string'||typeof r==='number'?r:a;});};}if(!String.prototype.trim){String.prototype.trim=function(){return this.replace(/^\s+|\s+$/g,"");};}
+			
+				y.include('http://test.erikeldridge.com/yql/json2.js');
+			
+				response.object = function() {
 
-                     y.include('http://github.com/kvz/phpjs/raw/master/functions/strings/trim.js');
+					var params = {
+						'openid.ns': 'http://specs.openid.net/auth/2.0',
+						'openid.mode': 'associate',
+						'openid.assoc_type': 'HMAC-SHA1',
+						'openid.session_type': 'no-encryption'
+					},
+						pairs = [];
 
-                     var assocUri = uri + '?' + pairs.join('&'),
-                         resp = y.rest(assocUri).get().response;
-                         
-                     if (!resp) {
-                        return {
-                            "error" : "no response"
-                        };
-                     }
-                     
-                     var arr = trim(resp).split('\n'),
-                         assoc = {};
-                         
-                     for( var i in arr ){
-                        var pair = arr[i].split(':');
-                        assoc[pair[0]] = pair[1];
-                     }
-                     
-                     return {
-                         "success" : assoc
-                     };
+					for (var key in params) {
+						pairs.push(key + '=' + encodeURIComponent(params[key]));
+					}
 
-                 }();
+
+
+					var assocUri = uri + '?' + pairs.join('&'),
+						resp = y.rest(assocUri).get().response;
+
+					if (!resp) {
+						return {
+							"error": "no response"
+						};
+					}
+
+					var arr = resp.trim().split('\n'),
+						assoc = {};
+
+					for (var i in arr) {
+						var pair = arr[i].split(':');
+						assoc[pair[0]] = pair[1];
+					}
+
+					if (assocStoreuri) {
+						assocStoreuri += y.crypto.encodeMd5(assoc);
+						var resp = y.rest(assocStoreuri).contentType('application/x-www-form-urlencoded').query({
+							'value': JSON.stringify( assoc )
+						}).post().response
+						return {
+							"success": resp.trim()
+						};
+					} else {
+						return {
+							"success": assoc
+						};
+					}
+				} ();
+
 
             ]]></execute>
         </select>
