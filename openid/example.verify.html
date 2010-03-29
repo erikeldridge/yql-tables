@@ -27,7 +27,8 @@ function parseQueryString (string) {
 }
 
 function handleStorageReady () {
-	var assocJson = encodeURIComponent( Y.JSON.stringify( Y.StorageLite.getItem('openid-assoc', true).query.results.success ) ),
+	var localUrl = document.location.href.substr( 0, document.location.href.indexOf('?') ),
+	    assocJson = encodeURIComponent( Y.JSON.stringify( Y.StorageLite.getItem('openid-assoc', true).query.results.success ) ),
 	    assertJson = encodeURIComponent( 
 	        Y.JSON.stringify( 
 	            parseQueryString( document.location.href.substr( document.location.href.indexOf('?') + 1 ) ) 
@@ -37,8 +38,9 @@ function handleStorageReady () {
 		    
 		    // for some reason, using @param w/ json results in json.parse error in yql, so pass json in query string
 		    'q=' + encodeURIComponent('use "http://test.erikeldridge.com/yql/openid/openid.verify.xml" as table;'
-		        +"select * from table where assocJson='"+assocJson+"' and assertJson='"+assertJson+"' and localUrl='http://test.erikeldridge.com/yql/example.verify.html'"
+		        +"select * from table where assocJson='"+assocJson+"' and assertJson='"+assertJson+"' and localUrl='"+localUrl+"'"
             ), 
+            
             'callback=', 
             'diagnostics=true', 
             'format=json', 
