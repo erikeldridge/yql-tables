@@ -17,17 +17,39 @@
                 Y.Node.get('#openid').set('href', json.query.results.success);
             },
             handleStorageReady = function () {
-                var returnTo = 'example.com',
-                    githubAcct ='erikeldridge',
-                    assocHandle = Y.StorageLite.getItem('openid-assoc', true).query.results.success.assoc_handle,
+                var returnTo = 'test.erikeldridge.com';
+                // var tableUri = 'http://github.com/erikeldridge/yql-tables/raw/master/openid/openid.xml';
+                var tableUri = 'http://test.erikeldridge.com/yql/openid/openid.xml';
+                var assocHandle = Y.StorageLite.getItem('openid-assoc', true).query.results.success.assoc_handle,
+                    axJson = Y.JSON.stringify([{
+                    	'schema':'http://axschema.org/contact/email',
+                    	'alias': 'email',
+                    	'required':true
+                    },
+                    {
+                    	'schema':'http://axschema.org/namePerson',
+                    	'alias':'fullname',
+                    	'required':true
+                    },
+                    {
+                    	'schema':'http://axschema.org/media/image/default',
+                    	'alias':'profile_pic',
+                    	'required':true
+                    },
+                    {
+                    	'schema':'http://axschema.org/person/gender',
+                    	'alias':'gender',
+                    	'required':true
+                    }]),
                     params = [
-                        'q='+encodeURIComponent('use "http://github.com/'+githubAcct+'/yql-tables/raw/master/openid/openid.xml" as table; '
+                        'q='+encodeURIComponent('use "'+tableUri+'" as table; '
                             + 'select * from table where '
                             + 'id="yahoo.com" and '
                             + 'return_to="http://'+returnTo+'" and '
-                            + 'assoc_handle="'+assocHandle+'"'),
+                            + 'assoc_handle="'+assocHandle+'" and '
+                            + "axJson='"+axJson+"'"),
                         'callback=',
-                        'diagnostics=false',
+                        'diagnostics=true',
                         'format=json',
                         'debug=true'
                     ],
