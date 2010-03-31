@@ -28,7 +28,7 @@
                         
                         var assoc = Y.StorageLite.getItem('openid-assoc', true);
                         
-                        if(!assocHandle){
+                        if(!assoc){
                             Y.Node.get('#openid')
                                 .set('href', 'example.assoc.html')
                                 .set('innerHTML', 'association required for verified auth.  click here to create one');
