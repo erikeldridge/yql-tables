@@ -2,6 +2,7 @@
     "http://www.w3.org/TR/html4/loose.dtd">
 <html>
     <body>
+        <a id="results">results</a>
         <script src="http://yui.yahooapis.com/3.0.0/build/yui/yui-min.js"></script>
         <script>
             var Y = YUI( {
@@ -21,13 +22,18 @@
                 Y.StorageLite.removeItem( 'openid-assoc' );
                 Y.StorageLite.setItem( 'openid-assoc', Y.JSON.stringify( data ) );
                 var json = Y.StorageLite.getItem( 'openid-assoc', true);
-                Y.log( json );
+                if(json){
+                    Y.log( json );
+                    Y.Node.get('#results')
+                        .set('innerHTML', 'assoc set')
+                        .set('href', 'example.html');
+                }
             }
             
-            Y.use( 'gallery-storage-lite', function (Y) {
+            Y.use( 'node', 'gallery-storage-lite', function (Y) {
                 var tableUri ='http://github.com/erikeldridge/yql-tables/raw/master/openid/openid.assoc.xml',
                     params = [
-                        'q='+encodeURIComponent('use "" as table; '
+                        'q='+encodeURIComponent('use "'+tableUri+'" as table; '
                             + 'select * from table where '
                             + 'uri="https://open.login.yahooapis.com/openid/op/auth"'
                         ),
