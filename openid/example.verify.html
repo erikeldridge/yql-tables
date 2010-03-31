@@ -5,6 +5,7 @@
         <div id="results">results</div>
         <script src="http://yui.yahooapis.com/3.0.0/build/yui/yui-min.js"></script>
         <script>
+        
         var Y = YUI({
         	modules: {
         		'gallery-storage-lite': {
@@ -15,12 +16,11 @@
         		}
         	}
         });
-        function handleIoComplete (id, o, args) {
-        	var json = Y.JSON.parse(o.responseText);
-        	Y.Node.get('#results').set('innerHTML', json.query.results.success);
+        
+        function handleIoComplete ( data ) {
+        	Y.Node.get('#results').set('innerHTML', data.query.results.success);
         }
-
-
+        
         function parseQueryString (string) {
             var params = string.split( '&' ),
                 pairs = {};
@@ -45,36 +45,21 @@
         		    // for some reason, using @param w/ json results in json.parse error in yql, so pass json in query string
         		    'q=' + encodeURIComponent('use "http://test.erikeldridge.com/yql/openid/openid.verify.xml" as table;'
         		        +"select * from table where assocJson='"+assocJson+"' and assertJson='"+assertJson
-        		        +"' and localUrl='"+localUrl+"' and nonceStoreUri='"+nonceStoreUri+"'"
+        		        +"' and localUrl='"+localUrl+"'"
                     ), 
-            
-                    'callback=', 
+                    'callback=handleIoComplete', 
                     'diagnostics=true', 
                     'format=json', 
                     'debug=true'
                 ],
-        		url = "http://query.yahooapis.com/v1/public/yql?" + params.join('&'),
-        		ioConfig = {
-        			method: 'GET',
-        			on: { success: handleIoComplete },
-        			xdr: { use: 'flash' }
-        		},
-        		xdrConfig = {
-        			id: 'flash',
-        			yid: Y.id,
-        			src: '../../../../io.swf'
-        	    };
-
-        	Y.io.transport(xdrConfig);
-
-        	Y.on('io:xdrReady', function() {
-        		Y.io(url, ioConfig);
-        	});
+        		url = "http://query.yahooapis.com/v1/public/yql?" + params.join('&');
+        	Y.Get.script( url );
         }
+        
         Y.use( 'io', 'gallery-storage-lite', function( Y ){
             Y.StorageLite.on('storage-lite:ready', handleStorageReady );
         } );
-
+        
         </script>
     </body>
 </html>
