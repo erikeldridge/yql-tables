@@ -1,4 +1,4 @@
-<a id="openid">click</a>
+<div id="results">results</div>
 <script src="http://yui.yahooapis.com/3.0.0/build/yui/yui-min.js"></script>
 <script>
 var Y = YUI({
@@ -13,7 +13,7 @@ var Y = YUI({
 });
 function handleIoComplete (id, o, args) {
 	var json = Y.JSON.parse(o.responseText);
-	Y.Node.get('#openid').set('href', json.query.results.success);
+	Y.Node.get('#results').set('innerHTML', json.query.results.success);
 }
 
 

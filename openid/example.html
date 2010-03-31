@@ -18,7 +18,7 @@
     }
     Y.use( 'node', 'gallery-storage-lite', function (Y) {
         var handleStorageReady = function () {
-                var returnTo = 'test.erikeldridge.com';
+                var returnTo = 'http://localhost/~eldridge/github/erikeldridge/yql-tables/openid/example.verify.html';
                 var tableUri = 'http://github.com/erikeldridge/yql-tables/raw/master/openid/openid.xml';
                 // var tableUri = 'http://test.erikeldridge.com/yql/openid/openid.xml';
                 var assocHandle = Y.StorageLite.getItem('openid-assoc', true).query.results.success.assoc_handle,
@@ -43,7 +43,8 @@
                     	'schema':'http://axschema.org/person/gender',
                     	'alias':'gender',
                     	'required':true
-                    }]),
+                    }
+                    ]),
                     
                     //hybrid auth (http://developer.yahoo.net/blog/archives/2009/09/yahoo_openid_hybrid.html)
                     oauthKey = 'dj0yJmk9TDNTVXpvRnpsbjJHJmQ9WVdrOVpXRlBkWEJETm1zbWNHbzlNQS0tJnM9Y29uc3VtZXJzZWNyZXQmeD0wYw--',
@@ -52,9 +53,9 @@
                         'q='+encodeURIComponent('use "'+tableUri+'" as table; '
                             + 'select * from table where '
                             + 'id="yahoo.com" and '
-                            + 'return_to="http://'+returnTo+'" and '
+                            + 'return_to="'+returnTo+'" and '
                             + 'assoc_handle="'+assocHandle+'" and '
-                            + "axJson='"+axJson+"' and "
+                            // + "axJson='"+axJson+"' and "
                             + "oauthKey='"+oauthKey+"'"),
                         'callback=handleIoComplete',
                         'diagnostics=true',
