@@ -26,6 +26,9 @@
 				-->
 				<key id="axJson" type="xs:string" paramType="variable" />
 				
+				<!-- oauth consumer key for hybrid auth (http://developer.yahoo.net/blog/archives/2009/09/yahoo_openid_hybrid.html) -->
+				<key id="oauthKey" type="xs:string" paramType="variable" />
+				
 				<!-- if you have an openid association, pass the handle here -->
                 <key id="assoc_handle" type="xs:string" paramType="variable" />
 
@@ -123,7 +126,7 @@
 					},
 					pairs = [];
 
-					//add ax, if defined
+					//add ax, if ax fields passed via yql param
 					if (axJson) {
 						params['openid.ns.ax'] = 'http://openid.net/srv/ax/1.0';
 						params['openid.ax.mode'] = 'fetch_request';
@@ -141,10 +144,13 @@
 						params['openid.ax.required'] = required.join(',');
 					}
 					
-					//oauth
-					params['openid.ns.oauth'] = 'http://specs.openid.net/extensions/oauth/1.0';
-					params['openid.oauth.consumer'] = 'dj0yJmk9aWhaR09fakekeynVxUVBQJmQ9WVdrOU56RmlaMGxXTjJzbWNHbzlNVEl5TW16a3gmcz1jb25zdW1lcnNlY3JldCZ4PTI5';
+					//add hybrid auth support, if key passed via yql param
+					if ( oauthKey ) {
+						params['openid.ns.oauth'] = 'http://specs.openid.net/extensions/oauth/1.0';
+						params['openid.oauth.consumer'] = oauthKey;
+					}
 					
+					//use assoc handle, if passed in yql param
 					if (assoc_handle) {
 						params['openid.assoc_handle'] = assoc_handle;
 					}

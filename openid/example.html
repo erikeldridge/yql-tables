@@ -21,6 +21,8 @@
                 // var tableUri = 'http://github.com/erikeldridge/yql-tables/raw/master/openid/openid.xml';
                 var tableUri = 'http://test.erikeldridge.com/yql/openid/openid.xml';
                 var assocHandle = Y.StorageLite.getItem('openid-assoc', true).query.results.success.assoc_handle,
+                
+                    //attribute exchange (http://developer.yahoo.net/blog/archives/2009/12/yahoo_openid_now_with_attribute_exchange.html)
                     axJson = Y.JSON.stringify([{
                     	'schema':'http://axschema.org/contact/email',
                     	'alias': 'email',
@@ -41,13 +43,18 @@
                     	'alias':'gender',
                     	'required':true
                     }]),
+                    
+                    //hybrid auth (http://developer.yahoo.net/blog/archives/2009/09/yahoo_openid_hybrid.html)
+                    oauthKey = 'youroauthkeyMcnVxUVBQJmQ9WVdrOU56RmlaMGxXTjJzbWNHbzlNVEl5TWprNE16a3gmcz1jb25zdW1lcnNlY3JldCZ4PTI5',
+                    
                     params = [
                         'q='+encodeURIComponent('use "'+tableUri+'" as table; '
                             + 'select * from table where '
                             + 'id="yahoo.com" and '
                             + 'return_to="http://'+returnTo+'" and '
                             + 'assoc_handle="'+assocHandle+'" and '
-                            + "axJson='"+axJson+"'"),
+                            + "axJson='"+axJson+"' and "
+                            + "oauthKey='"+oauthKey+"'"),
                         'callback=',
                         'diagnostics=true',
                         'format=json',
