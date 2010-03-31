@@ -9,7 +9,10 @@ function yql( $query )
         'debug' => 'true'
     );
     $yql_uri = "http://query.yahooapis.com/v1/public/yql?".http_build_query( $params );
-    $json = file_get_contents( $yql_uri );
+    $ch = curl_init( $yql_uri );
+    curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true );
+    $json = curl_exec( $ch );
+    curl_close( $ch );
     $data = json_decode( $json );
     return $data->query->results;
 }
@@ -62,13 +65,16 @@ function fetch_auth_url( $id, $return_to, $assoc_handle = null, $ax_json = null 
 function verify_assertion( $local_uri, $assert_json, $assoc_json = null, $nonce_store_uri = null )
 {
     $table_uri = 'http://github.com/erikeldridge/yql-tables/raw/master/openid/openid.verify.xml';
-    $query = "use '$table_uri' as table; select * from table where localUri='$local_uri' and assertJson='$assert_json'";
+    $query = "use '$table_uri' as table; select * from table where localUrl='$local_uri' and assertJson='$assert_json'";
     if( $assoc_json ){
         $query .= " and assocJson='$assoc_json'";
     }
     if( $nonce_store_uri ){
         $query .= " and nonceStoreUri='$nonce_store_uri'";
     }
+    $query = stripslashes($query);
+    $query = str_replace( 'openid_', 'openid.', $query );
+    $query = str_replace( 'pape_auth_level_nist', 'pape.auth_level.nist', $query );
     $results = yql( $query );
     if( $results->error ){
         throw new Exception( 'error response: '.$results->error );
