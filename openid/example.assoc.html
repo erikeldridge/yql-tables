@@ -1,52 +1,58 @@
-<script src="http://yui.yahooapis.com/3.0.0/build/yui/yui-min.js"></script>
-<script>
-    YUI( {
-        modules: {
-            'gallery-storage-lite': {
-                fullpath: 'http://yui.yahooapis.com/gallery-2010.02.22-22/build/gallery-storage-lite/gallery-storage-lite-min.js',
-                requires: ['event-base','event-custom','event-custom-complex','json'],
-                optional: [],
-                supersedes: []
-          }
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+    "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+    <body>
+        <script src="http://yui.yahooapis.com/3.0.0/build/yui/yui-min.js"></script>
+        <script>
+            YUI( {
+                modules: {
+                    'gallery-storage-lite': {
+                        fullpath: 'http://yui.yahooapis.com/gallery-2010.02.22-22/build/gallery-storage-lite/gallery-storage-lite-min.js',
+                        requires: ['event-base','event-custom','event-custom-complex','json'],
+                        optional: [],
+                        supersedes: []
+                  }
 
-        }
-    } ).use('io', 'gallery-storage-lite', function (Y) {
-        var githubAcct ='erikeldridge',
-            handleComplete = function (id, o, args) {
-                //storage lite rocks! http://yuilibrary.com/gallery/show/storage-lite
-                Y.StorageLite.on('storage-lite:ready', function () {Y.log( o.responseText );
-                    Y.StorageLite.removeItem( 'openid-assoc' );
-                    Y.StorageLite.setItem( 'openid-assoc', o.responseText );
-                });
-                var json = Y.StorageLite.getItem( 'openid-assoc', true);
-                Y.log( json );
-            },
-            params = [
-                'q='+encodeURIComponent('use "http://github.com/'+githubAcct+'/yql-tables/raw/master/openid/openid.assoc.xml" as table; '
-                    + 'select * from table where '
-                    + 'uri="https://open.login.yahooapis.com/openid/op/auth"'
-                ),
-                'callback=',
-                'diagnostics=false',
-                'format=json',
-                'debug=true'
-            ],
-            uri = "http://query.yahooapis.com/v1/public/yql?"+params.join('&'),
-            ioConfig = {
-                method: 'GET',
-                on: { success: handleComplete },
-                xdr: { use: 'flash' }
-            },
-            xdrConfig = {
-                id:'flash',
-                yid: Y.id, 
-                src:'../../../../io.swf'
-            };
+                }
+            } ).use('io', 'gallery-storage-lite', function (Y) {
+                var githubAcct ='erikeldridge',
+                    handleComplete = function (id, o, args) {
+                        //storage lite rocks! http://yuilibrary.com/gallery/show/storage-lite
+                        Y.StorageLite.on('storage-lite:ready', function () {Y.log( o.responseText );
+                            Y.StorageLite.removeItem( 'openid-assoc' );
+                            Y.StorageLite.setItem( 'openid-assoc', o.responseText );
+                        });
+                        var json = Y.StorageLite.getItem( 'openid-assoc', true);
+                        Y.log( json );
+                    },
+                    params = [
+                        'q='+encodeURIComponent('use "http://github.com/'+githubAcct+'/yql-tables/raw/master/openid/openid.assoc.xml" as table; '
+                            + 'select * from table where '
+                            + 'uri="https://open.login.yahooapis.com/openid/op/auth"'
+                        ),
+                        'callback=',
+                        'diagnostics=false',
+                        'format=json',
+                        'debug=true'
+                    ],
+                    uri = "http://query.yahooapis.com/v1/public/yql?"+params.join('&'),
+                    ioConfig = {
+                        method: 'GET',
+                        on: { success: handleComplete },
+                        xdr: { use: 'flash' }
+                    },
+                    xdrConfig = {
+                        id:'flash',
+                        yid: Y.id, 
+                        src:'../../../../io.swf'
+                    };
             
-            Y.io.transport(xdrConfig);
+                    Y.io.transport(xdrConfig);
             
-            Y.on('io:xdrReady', function () {
-                Y.io(uri, ioConfig);
+                    Y.on('io:xdrReady', function () {
+                        Y.io(uri, ioConfig);
+                    });
             });
-    });
-</script>
+        </script>
+    </body>
+</html>
