@@ -6,30 +6,28 @@
         <script>
             var Y = YUI( {
                 modules: {
+                    
+                    //storage lite rocks! http://yuilibrary.com/gallery/show/storage-lite
                     'gallery-storage-lite': {
                         fullpath: 'http://yui.yahooapis.com/gallery-2010.02.22-22/build/gallery-storage-lite/gallery-storage-lite-min.js',
                         requires: ['event-base','event-custom','event-custom-complex','json'],
                         optional: [],
                         supersedes: []
                   }
-
                 }
             } );
             
             function handleComplete ( data ) {
-                //storage lite rocks! http://yuilibrary.com/gallery/show/storage-lite
-                Y.StorageLite.on('storage-lite:ready', function () {
-                    Y.StorageLite.removeItem( 'openid-assoc' );
-                    Y.StorageLite.setItem( 'openid-assoc', Y.JSON.stringify( data ) );
-                });
+                Y.StorageLite.removeItem( 'openid-assoc' );
+                Y.StorageLite.setItem( 'openid-assoc', Y.JSON.stringify( data ) );
                 var json = Y.StorageLite.getItem( 'openid-assoc', true);
                 Y.log( json );
             }
             
-            Y.use('io', 'gallery-storage-lite', function (Y) {
-                var githubAcct ='erikeldridge',
+            Y.use( 'gallery-storage-lite', function (Y) {
+                var tableUri ='http://github.com/erikeldridge/yql-tables/raw/master/openid/openid.assoc.xml',
                     params = [
-                        'q='+encodeURIComponent('use "http://github.com/'+githubAcct+'/yql-tables/raw/master/openid/openid.assoc.xml" as table; '
+                        'q='+encodeURIComponent('use "" as table; '
                             + 'select * from table where '
                             + 'uri="https://open.login.yahooapis.com/openid/op/auth"'
                         ),
@@ -39,7 +37,10 @@
                         'debug=true'
                     ],
                     uri = "http://query.yahooapis.com/v1/public/yql?"+params.join('&');
-                Y.Get.script( uri );
+                    
+                Y.StorageLite.on('storage-lite:ready', function () {
+                    Y.Get.script( uri );
+                });
             });
         </script>
     </body>
