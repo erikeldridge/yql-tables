@@ -57,7 +57,7 @@ try {
     validate_structure( $url );
     printf('pass: %s<br/>', $test );
 } catch (Exception $e) {
-   printf("<p>fail:<br/><pre>%s</pre></p>", print_r( "$test\n$e", true ) );
+   printf("<p>fail: $test<br/><pre>%s</pre></p>", print_r( $e->getMessage(), true ) );
 }
 
 //yahoo w/ assoc handle
@@ -69,7 +69,7 @@ try {
     validate_structure( $url );
     printf('pass: %s<br/>', $test );
 } catch (Exception $e) {
-   printf("<p>fail:<br/><pre>%s</pre></p>", print_r( "$test\n$e", true ) );
+   printf("<p>fail:<br/><pre>%s</pre></p>", print_r( $e->getMessage(), true ) );
 }
 
 //yahoo w/ ax
@@ -81,7 +81,7 @@ try {
     validate_structure( $url );
     printf('pass: %s<br/>', $test );
 } catch (Exception $e) {
-   printf("<p>fail:<br/><pre>%s</pre></p>", print_r( "$test\n$e", true ) );
+   printf("<p>fail:<br/><pre>%s</pre></p>", print_r( $e->getMessage(), true ) );
 }
 
 //yahoo w/ assoc handle, ax
@@ -93,7 +93,7 @@ try {
     validate_structure( $url );
     printf('pass: %s<br/>', $test );
 } catch (Exception $e) {
-   printf("<p>fail:<br/><pre>%s</pre></p>", print_r( "$test\n$e", true ) );
+   printf("<p>fail:<br/><pre>%s</pre></p>", print_r( $e->getMessage(), true ) );
 }
 
 //test valid base url
@@ -106,7 +106,7 @@ $base_url = substr( $url, 0, strpos( $url, '?' ) );
 if( 'https://open.login.yahooapis.com/openid/op/auth' == $base_url ){
     printf('pass: %s<br/>', $test );
 } else {
-   printf("<p>fail:<br/><pre>%s</pre></p>", print_r( "$base_url\n$e", true ) );
+   printf("<p>fail $test:<br/><pre>%s</pre></p>", print_r( "$base_url", true ) );
 }
 
 //google
@@ -118,7 +118,7 @@ $base_url = substr( $url, 0, strpos( $url, '?' ) );
 if( 'https://open.login.yahooapis.com/openid/op/auth' == $base_url ){
     printf('pass: %s<br/>', $test );
 } else {
-   printf("<p>fail:<br/><pre>%s</pre></p>", print_r( "$base_url\n$e", true ) );
+   printf("<p>fail $test:<br/><pre>%s</pre></p>", print_r( "$base_url", true ) );
 }
 
 ?>
