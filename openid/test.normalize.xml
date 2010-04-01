@@ -12,15 +12,14 @@
         <select produces="JSON">
             <inputs></inputs>
             <execute><![CDATA[
-            
-            //ref: http://openid.net/specs/openid-authentication-2_0.html#normalization_example
 
 			//credit: http://javascript.crockford.com/remedial.html
 			if(!String.prototype.supplant){String.prototype.supplant=function(o){return this.replace(/{([^{}]*)}/g,function(a,b){var r=o[b];return typeof r==='string'||typeof r==='number'?r:a;});};}if(!String.prototype.trim){String.prototype.trim=function(){return this.replace(/^\s+|\s+$/g,"");};}
 			
 			var tableUri = 'http://github.com/erikeldridge/yql-tables/raw/master/openid/openid.normalize.xml';
 			
-			//case
+			//cases
+			//ref: http://openid.net/specs/openid-authentication-2_0.html#normalization_example
 			testCases = [
 				function(){
 					y.log( 'test case: valid, no scheme' );
