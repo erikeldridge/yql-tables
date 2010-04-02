@@ -33,37 +33,46 @@
 						'openid.mode': 'associate',
 						'openid.assoc_type': 'HMAC-SHA1',
 						'openid.session_type': 'no-encryption'
-					},
-						pairs = [];
+					};
+					var pairs = [];
 
 					for (var key in params) {
 						pairs.push(key + '=' + encodeURIComponent(params[key]));
 					}
 
+					var assocUri = uri + '?' + pairs.join('&');
+					var req = y.rest(assocUri).get();
 
-
-					var assocUri = uri + '?' + pairs.join('&'),
-						resp = y.rest(assocUri).get().response;
-
-					if (!resp) {
+					if ( 200 !== req.status ) {
 						return {
-							"error": "no response"
+							"error": 'non-200 response status: ' + req.status
 						};
 					}
 
-					var arr = resp.trim().split('\n'),
-						assoc = {};
+					var arr = req.response.trim().split('\n');
+					var params = {};
 
 					for (var i in arr) {
 						var pair = arr[i].split(':');
-						assoc[pair[0]] = pair[1];
+						params[pair[0]] = pair[1];
+						break;
+					}
+					
+					if ( params.assoc_handle ) {
+						return {
+							"success": params
+						};
+					} else if ( params.error ) {
+						return {
+							"error": 'unsuccessful response: ' + req.response
+						};
+					} else {
+						return {
+							"error": 'invalid response returned: ' + req.response
+						};
 					}
 
-					return {
-						"success": assoc
-					};
 				} ();
-
 
             ]]></execute>
         </select>
