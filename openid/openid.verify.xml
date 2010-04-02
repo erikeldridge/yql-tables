@@ -21,7 +21,7 @@
 				//credit: http://javascript.crockford.com/remedial.html
 				if(!String.prototype.supplant){String.prototype.supplant=function(o){return this.replace(/{([^{}]*)}/g,function(a,b){var r=o[b];return typeof r==='string'||typeof r==='number'?r:a;});};}if(!String.prototype.trim){String.prototype.trim=function(){return this.replace(/^\s+|\s+$/g,"");};}
 				
-				y.include('http://test.erikeldridge.com/yql/json2.js');
+				y.include( 'store://pitrYOXYb8vQfiui4rUYPX' );
 				y.include('http://test.erikeldridge.com/yql/2.0.0-crypto-sha1.js');
 				y.include('http://crypto-js.googlecode.com/files/2.0.0-hmac-min.js');
 										
