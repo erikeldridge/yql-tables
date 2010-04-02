@@ -8,8 +8,6 @@
         </description>
 		<!-- yahoo -->
         <sampleQuery>select * from {table} where uri="https://open.login.yahooapis.com/openid/op/auth"</sampleQuery>
-		<!-- google -->
-		<!-- select * from {table} where uri="https://www.google.com/accounts/o8/ud" -->
     </meta>
     <bindings>
         <select produces="JSON">
@@ -55,7 +53,6 @@
 					for (var i in arr) {
 						var pair = arr[i].split(':');
 						params[pair[0]] = pair[1];
-						break;
 					}
 					
 					if ( params.assoc_handle ) {
