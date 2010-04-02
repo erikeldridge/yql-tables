@@ -32,6 +32,7 @@
         }
 
         function handleStorageReady () {
+            var tableUri = 'http://github.com/erikeldridge/yql-tables/raw/master/openid/openid.verify.xml';
         	var localUrl = document.location.href.substr( 0, document.location.href.indexOf('?') ),
         	    nonceStoreUri = 'http://example.com/nonces/',
         	    assocJson = encodeURIComponent( Y.JSON.stringify( Y.StorageLite.getItem('openid-assoc', true).query.results.success ) ),
@@ -43,7 +44,7 @@
         		params = [
 		    
         		    // for some reason, using @param w/ json results in json.parse error in yql, so pass json in query string
-        		    'q=' + encodeURIComponent('use "http://test.erikeldridge.com/yql/openid/openid.verify.xml" as table;'
+        		    'q=' + encodeURIComponent('use "'+tableUri+'" as table;'
         		        +"select * from table where assocJson='"+assocJson+"' and assertJson='"+assertJson
         		        +"' and localUrl='"+localUrl+"'"
                     ), 
