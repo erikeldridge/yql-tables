@@ -42,7 +42,7 @@
                         'format=json',
                         'debug=true'
                     ],
-                    uri = "http://query.yahooapis.com/v1/public/yql?"+params.join('&');
+                    uri = "https://query.yahooapis.com/v1/public/yql?"+params.join('&');
                     
                 Y.StorageLite.on('storage-lite:ready', function () {
                     Y.Get.script( uri );

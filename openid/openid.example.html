@@ -34,7 +34,7 @@
                                 .set('innerHTML', 'association required for verified auth.  click here to create one');
                             return;
                         }
-                        
+                        Y.log(assoc);
                         var assocHandle = assoc.query.results.success.assoc_handle,
                 
                             //attribute exchange (http://developer.yahoo.net/blog/archives/2009/12/yahoo_openid_now_with_attribute_exchange.html)
@@ -76,7 +76,7 @@
                                 'format=json',
                                 'debug=true'
                             ],
-                            url = "http://query.yahooapis.com/v1/public/yql?"+params.join('&');
+                            url = "https://query.yahooapis.com/v1/public/yql?"+params.join('&');
                         Y.Get.script( url );
                     };
             
