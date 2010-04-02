@@ -2,8 +2,11 @@
 <table xmlns="http://query.yahooapis.com/v1/schema/table.xsd">
     <meta>
         <author>Erik Eldridge</author>
-        <description>Unit tests for openid normalization</description>
+        <description>
+			Unit tests for openid normalization
+		</description>
         <sampleQuery>select * from {table}</sampleQuery>
+		<documentationURL>http://wiki.github.com/ydn/yql-openid-support/</documentationURL>
     </meta>
     <bindings>
         <select produces="JSON">

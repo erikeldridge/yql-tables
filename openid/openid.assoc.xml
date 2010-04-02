@@ -3,11 +3,11 @@
     <meta>
         <author>Erik Eldridge</author>
         <description>
-            - generate an openid association for caller to store
-            - For more info see http://openid.net/specs/openid-authentication-2_0.html#associations
+            Generate an openid association for caller to store
         </description>
 		<!-- yahoo -->
         <sampleQuery>select * from {table} where uri="https://open.login.yahooapis.com/openid/op/auth"</sampleQuery>
+		<documentationURL>http://wiki.github.com/ydn/yql-openid-support/</documentationURL>
     </meta>
     <bindings>
         <select produces="JSON">

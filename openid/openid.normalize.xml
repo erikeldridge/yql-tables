@@ -3,10 +3,10 @@
 	<meta>
 		<author>Erik Eldridge</author>
 		<description>
-			Normalize url for openid usage as per 
-			http://openid.net/specs/openid-authentication-2_0.html#discovery
+			Normalize url for openid usage		
 		</description>
 		<sampleQuery>select * from {table} where id='yahoo.com'</sampleQuery>
+		<documentationURL>http://wiki.github.com/ydn/yql-openid-support/</documentationURL>
 	</meta>
 	<bindings>
 		<select produces="JSON">

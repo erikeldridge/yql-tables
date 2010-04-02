@@ -3,11 +3,10 @@
     <meta>
         <author>Erik Eldridge</author>
         <description>
-            - generate an openid auth url from an identifier.  
-            - supports openid 2.0 only, ie is not 1.1 compat
-            - For more info see http://openid.net/specs/openid-authentication-2_0.html
+            Generate an openid auth url from an identifier (openid 2.0 only, ie is not 1.1 compat)
         </description>
         <sampleQuery>select * from {table} where identifier="yahoo.com" and return_to="http://example.com"</sampleQuery>
+		<documentationURL>http://wiki.github.com/ydn/yql-openid-support/</documentationURL>
     </meta>
     <bindings>
         <select produces="XML">

@@ -3,9 +3,10 @@
     <meta>
         <author>Erik Eldridge w/ help from Yu Wang</author>
         <description>
-			verify positive assertion.  For more info see http://openid.net/specs/openid-authentication-2_0.html#verification
+			Verify positive assertion
         </description>
         <sampleQuery>select * from {table} where localUrl='http://example.com' and assertJson='{...}' and assocJson='{...}'</sampleQuery>
+		<documentationURL>http://wiki.github.com/ydn/yql-openid-support/</documentationURL>
     </meta>
     <bindings>
         <select produces="JSON">
