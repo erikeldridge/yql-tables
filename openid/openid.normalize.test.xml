@@ -19,7 +19,9 @@
 			//ref: http://openid.net/specs/openid-authentication-2_0.html#normalization_example
 			testCases = [
 				function(){
-					y.log( 'test case: valid, no scheme' );
+					var output = {
+						'case': 'valid, no scheme'
+					};
 					
 					var query = 'use "{tableUri}" as table; select * from table where id="{id}"'.supplant({
 						tableUri: tableUri,
@@ -30,20 +32,22 @@
 					
 					//tests
 					if ( 'error' === results.state ) {
-						y.log( 'error response ('+results.details+'), an id w/ no schema is still valid' );
-						return 'fail';
+						output['fail'] = 'error response ('+results.details+'), an id w/ no schema is still valid';
+						return output;
 					}
 					
 					if ( 'http://yahoo.com/' === results.id ) {
-						y.log( 'the normalized form of yahoo.com/ should be http://yahoo.com/, not '+results.id );
-						return 'fail';
+						output['fail'] = 'the normalized form of yahoo.com/ should be http://yahoo.com/, not '+results.id;
+						return output;
 					}
 					
 					//pass if no tests fail
 					return 'pass';
 				}(),
 				function(){
-					y.log( 'test case: valid http scheme' );
+					var output = {
+						'case': 'valid http schema'
+					};
 					
 					var query = 'use "{tableUri}" as table; select * from table where id="{id}"'.supplant({
 						tableUri: tableUri,
@@ -54,20 +58,22 @@
 					
 					//tests
 					if ( 'error' === results.state ) {
-						y.log( 'test: error response ('+results.details+'), but http schema should be valid' );
-						return 'fail';
+						output['fail'] = 'test: error response ('+results.details+'), but http schema should be valid';
+						return output;
 					}
 					
-					if ( 'https://yahoo.com/' === results.id ) {
-						y.log( 'test: the normalized form of http://yahoo.com/ should be http://yahoo.com/, not '+results.id );
-						return 'fail';
+					if ( 'http://yahoo.com/' === results.id ) {
+						output['fail'] = 'test: the normalized form of http://yahoo.com/ should be http://yahoo.com/, not '+results.id;
+						return output;
 					}
 					
 					//pass if no tests fail
 					return 'pass';
 				}(),
 				function(){
-					y.log( 'test case: valid https scheme' );
+					var output = {
+						'case': 'valid https schema'
+					};
 					
 					var query = 'use "{tableUri}" as table; select * from table where id="{id}"'.supplant({
 						tableUri: tableUri,
@@ -78,13 +84,13 @@
 					
 					//tests
 					if ( 'error' === results.state ) {
-						y.log( 'test: error response ('+results.details+'), but https schema should be valid' );
-						return 'fail';
+						output['fail'] = 'test: error response ('+results.details+'), but https schema should be valid';
+						return output;
 					}
 					
 					if ( 'https://yahoo.com/' === results.id ) {
-						y.log( 'test: the normalized form of https://yahoo.com/ should be https://yahoo.com/, not '+results.id );
-						return 'fail';
+						output['fail'] = 'test: the normalized form of https://yahoo.com/ should be https://yahoo.com/, not '+results.id;
+						return output;
 					}
 					
 					//pass if no tests fail
