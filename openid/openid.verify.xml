@@ -5,14 +5,14 @@
         <description>
 			verify positive assertion.  For more info see http://openid.net/specs/openid-authentication-2_0.html#verification
         </description>
-        <sampleQuery>select * from {table} where request="{request to RP}" and host="{RP host}"</sampleQuery>
+        <sampleQuery>select * from {table} where localUrl='http://example.com' and assertJson='{...}' and assocJson='{...}'</sampleQuery>
     </meta>
     <bindings>
         <select produces="JSON">
             <inputs>
 				<key id="localUrl" type="xs:string" paramType="variable" required="true"/>
                 <key id="assertJson" type="xs:string" paramType="variable" required="true"/>
-				<key id="assocJson" type="xs:string" paramType="variable"/>
+				<key id="assocJson" type="xs:string" paramType="variable" required="true"/>
 				<key id="nonceStoreUri" type="xs:string" paramType="variable"/>
             </inputs>
             <execute><![CDATA[
@@ -25,8 +25,15 @@
 				y.include('http://crypto-js.googlecode.com/files/2.0.0-hmac-min.js');
 										
 				response.object = function() {
-					assertion = JSON.parse(decodeURIComponent(assertJson));
-
+					
+					try {
+						var assertion = JSON.parse(decodeURIComponent(assertJson));
+					} catch ( e ) {
+						return {
+							"error": "invalid assertJson: "+e
+						};
+					}
+					
 					//note: this doesn't validate query parameters in return_to
 					if (assertion['openid.return_to'].trim() !== localUrl) {
 						return {
