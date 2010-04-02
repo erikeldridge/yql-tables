@@ -37,7 +37,7 @@
 				y.include('http://test.erikeldridge.com/yql/json2.js');
 				
 				//set this domain to your base uri for testing 
-				var domain = 'http://github.com/erikeldridge/yql-tables/raw/master/openid',
+				var domain = 'http://github.com/yql/yql-tables/raw/master/openid',
 					normalize = function(id) {
 					var tableUri = domain + '/openid.normalize.xml',
 						query = 'use "' + tableUri + '" as norm; ' + 'select * from norm where id="' + id + '"',
