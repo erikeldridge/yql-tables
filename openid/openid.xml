@@ -38,21 +38,23 @@
 				y.include( 'store://pitrYOXYb8vQfiui4rUYPX' );
 				
 				//set this domain to your base uri for testing 
-				var normalize = function(id) {
+				var domain = 'http://github.com/yql/yql-tables/raw/master/openid';
+				
+				function normalize (id) {
 						
 					//normalize table
-					var tableUri = 'store://OFvQhcRZIjcRa7F255lKBh',
-					
-						query = 'use "' + tableUri + '" as norm; ' + 'select * from norm where id="' + id + '"',
-						results = y.xmlToJson(y.query(query).results);
+					var tableUri = 'store://OFvQhcRZIjcRa7F255lKBh';
+					var query = 'use "' + tableUri + '" as norm; ' + 'select * from norm where id="' + id + '"';
+					var results = y.xmlToJson(y.query(query).results);
 
 					if ('success' == results.results.result.state) {
 						return results.results.result.id;
 					} else {
 						return false;
 					}
-				},
-					discover = function(normId) {
+				}
+				
+				function discover (normId) {
 
 					//try yadis
 					var yadisTableUri = domain + '/openid.yadis.xml?r=5',
@@ -75,10 +77,6 @@
 
 					//ok, yadis and html fail, so give up
 					return false;
-				},
-					formatAx = function(fields) {
-
-					return params;
 				};
 
 				//use a wrapper fn so we can exit early, ie as a workaround for lack of exit(), die(), etc
