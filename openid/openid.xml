@@ -38,9 +38,11 @@
 				y.include( 'store://pitrYOXYb8vQfiui4rUYPX' );
 				
 				//set this domain to your base uri for testing 
-				var domain = 'http://github.com/yql/yql-tables/raw/master/openid',
-					normalize = function(id) {
-					var tableUri = domain + '/openid.normalize.xml',
+				var normalize = function(id) {
+						
+					//normalize table
+					var tableUri = 'store://OFvQhcRZIjcRa7F255lKBh',
+					
 						query = 'use "' + tableUri + '" as norm; ' + 'select * from norm where id="' + id + '"',
 						results = y.xmlToJson(y.query(query).results);
 
