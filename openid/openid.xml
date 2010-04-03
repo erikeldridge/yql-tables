@@ -37,13 +37,11 @@
 				//json
 				y.include( 'store://pitrYOXYb8vQfiui4rUYPX' );
 				
-				//set this domain to your base uri for testing 
-				var domain = 'http://github.com/yql/yql-tables/raw/master/openid';
-				
 				function normalize (id) {
 						
 					//normalize table
 					var tableUri = 'store://OFvQhcRZIjcRa7F255lKBh';
+					
 					var query = 'use "' + tableUri + '" as norm; ' + 'select * from norm where id="' + id + '"';
 					var results = y.xmlToJson(y.query(query).results);
 
@@ -55,9 +53,9 @@
 				}
 				
 				function discover (normId) {
-
+					
 					//try yadis
-					var yadisTableUri = domain + '/openid.yadis.xml?r=5',
+					var yadisTableUri = 'http://github.com/erikeldridge/yql-tables/raw/master/openid/openid.yadis.xml',
 						yadisQuery = 'use "' + yadisTableUri + '" as yadis; ' + 'select * from yadis where uri = "' + normId + '"',
 						yadisResults = y.xmlToJson(y.query(yadisQuery).results);
 
