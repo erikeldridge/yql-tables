@@ -7,7 +7,7 @@
         </description>
 		<!-- yahoo -->
         <sampleQuery>select * from {table} where uri="https://open.login.yahooapis.com/openid/op/auth"</sampleQuery>
-		<documentationURL>http://wiki.github.com/ydn/yql-openid-support/</documentationURL>
+		<documentationURL>http://wiki.github.com/erikeldridge/yql-openid-support/</documentationURL>
     </meta>
     <bindings>
         <select produces="JSON">
@@ -22,6 +22,7 @@
 				//credit: http://javascript.crockford.com/remedial.html
 				if(!String.prototype.supplant){String.prototype.supplant=function(o){return this.replace(/{([^{}]*)}/g,function(a,b){var r=o[b];return typeof r==='string'||typeof r==='number'?r:a;});};}if(!String.prototype.trim){String.prototype.trim=function(){return this.replace(/^\s+|\s+$/g,"");};}
 			
+				//json
 				y.include( 'store://pitrYOXYb8vQfiui4rUYPX' );
 			
 				response.object = function() {

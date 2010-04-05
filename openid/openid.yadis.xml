@@ -6,7 +6,7 @@
             Fetch an XRDS document via yadis
         </description>
         <sampleQuery>select * from {table} where uri="http://www.yahoo.com/"</sampleQuery>
-		<documentationURL>http://wiki.github.com/ydn/yql-openid-support/</documentationURL>
+		<documentationURL>http://wiki.github.com/erikeldridge/yql-openid-support/</documentationURL>
     </meta>
     <bindings>
         <select produces="JSON">
