@@ -43,7 +43,7 @@
 						};
 					}
 
-					//try html table          
+					//try scraping w/ the native html table         
 					var htmlQuery = 'select * from html where url="{url}" and xpath=\'//link[@rel="openid2.provider"]\''.supplant({
 						'url' : normalizedId
 					});
@@ -54,7 +54,7 @@
 						};
 					}
 
-					//kludge: try raw html fetch.  the native html table no longer seems to be returning the head element       
+					//try raw html fetch  
 					var htmlResults = y.rest( normalizedId ).get().response;
 					
 					//this is super brittle, but it works for flickr, so it's a start
