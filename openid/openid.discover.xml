@@ -43,17 +43,29 @@
 						};
 					}
 
-					//try html                    
+					//try html table          
 					var htmlQuery = 'select * from html where url="{url}" and xpath=\'//link[@rel="openid2.provider"]\''.supplant({
 						'url' : normalizedId
 					});
-					var htmlResults = y.xmlToJson( y.query( htmlQuery ).results );
+					var htmlResults = y.xmlToJson( y.query( htmlQuery ).results );y.log(htmlResults);
 					if ( htmlResults.results ) {
 						return {
 							'success' : htmlResults.results.link.href
 						};
 					}
 
+					//kludge: try raw html fetch.  the native html table no longer seems to be returning the head element       
+					var htmlResults = y.rest( normalizedId ).get().response;
+					
+					//this is super brittle, but it works for flickr, so it's a start
+					var matches = htmlResults.match(/<link rel="openid2\.provider" href="([^"]+)"[^>]*>/);
+					
+					if ( matches[1] ) {
+						return {
+							'success' : matches[1]
+						};
+					}
+					
 					//ok, yadis and html fail, so give up
 					return {
 						'error': 'yadis and html fail'
