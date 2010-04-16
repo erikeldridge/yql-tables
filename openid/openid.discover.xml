@@ -38,8 +38,16 @@
 							'url' : yadisResults.results.result.uri 
 						});
 						var xrdsResult = y.xmlToJson( y.query( xrdsQuery ).results );
+						
+						//kludge: for the orange.fr xrds doc, xmlToJson creates a 'content' node
+						if ( xrdsResult.results.XRDS.XRD.Service.URI.content ) {
+							var xrdsUri = xrdsResult.results.XRDS.XRD.Service.URI.content;
+						} else {
+							var xrdsUri = xrdsResult.results.XRDS.XRD.Service.URI;
+						}
+						
 						return {
-							'success' : xrdsResult.results.XRDS.XRD.Service.URI
+							'success' : xrdsUri
 						};
 					}
 
@@ -47,7 +55,7 @@
 					var htmlQuery = 'select * from html where url="{url}" and xpath=\'//link[@rel="openid2.provider"]\''.supplant({
 						'url' : normalizedId
 					});
-					var htmlResults = y.xmlToJson( y.query( htmlQuery ).results );y.log(htmlResults);
+					var htmlResults = y.xmlToJson( y.query( htmlQuery ).results );
 					if ( htmlResults.results ) {
 						return {
 							'success' : htmlResults.results.link.href
