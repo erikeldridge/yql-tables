@@ -3,6 +3,7 @@
 	<meta>
 		<author>Erik Eldridge</author>
 		<sampleQuery>select * from {table} where uri='http://example.com' and consumerKey='asd123' and consumerSecret='zxc456' and callbackUri='http://example.com';</sampleQuery>
+		<documentationURL>http://wiki.github.com/erikeldridge/yql-oauth-support/</documentationURL>
 	</meta>
 	<bindings>
 		<select itemPath="" produces="XML">
