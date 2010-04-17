@@ -2,13 +2,11 @@
 <table xmlns="http://query.yahooapis.com/v1/schema/table.xsd">
 	<meta>
 		<author>Erik Eldridge</author>
-		<sampleQuery>select * from {table} where uri='http://example.com' and key='asd123' and secret='zxc456';</sampleQuery>
-		<!-- ref: http://developer.yahoo.com/yql/guide/yql-execute-examples.html#yql-execute-example-oauth-netflix -->
+		<sampleQuery>select * from {table} where uri='http://example.com' and key='asd123' and secret='zxc456' and cback='http://example.com';</sampleQuery>
 	</meta>
 	<bindings>
 		<select itemPath="" produces="XML">
 			<inputs>
-				<key id="method" type="xs:string" paramType="variable" default="GET"/>
 				<key id="uri" type="xs:string" paramType="variable" required="true"/>
 				<key id="key" type="xs:string" paramType="variable" required="true"/>
 				<key id="secret" type="xs:string" paramType="variable" required="true"/>
@@ -16,58 +14,27 @@
 			</inputs>
 			<execute><![CDATA[
 			
-			//kludge: oauth lib depends on document.getElementsByTagName (i know!)
-			var document = {
-				getElementsByTagName: function() {}
-			};
-
-			y.include("http://oauth.googlecode.com/svn/code/javascript/oauth.js");
-			y.include("http://oauth.googlecode.com/svn/code/javascript/sha1.js");
-			y.include('http://github.com/kvz/phpjs/raw/master/functions/url/parse_url.js');
-
+			y.include( "http://github.com/yql/yql-tables/raw/master/oauth/oauth.utils.js" );
+			y.include( 'http://github.com/kvz/phpjs/raw/master/functions/url/parse_url.js' );
+			
+			var parsed = parse_url( uri );
 			var accessor = {
 				consumerSecret: secret,
-				tokenSecret: ""
+				consumerKey: key,
+				tokenSecret: "",
+				realm: parsed['scheme'] + '://' + parsed['host']
 			};
-			
-			var message = {
-				action: uri,
-				method: method,
-				parameters: [
-					["oauth_consumer_key", key],
-					["oauth_version", "1.0"]]
+			var args = {
+				accessor: accessor,
+				parameters:[]
 			};
 			
 			if ( cback ) {
-				message.parameters.push( ["oauth_callback", cback] );
+				args.parameters.push( ["oauth_callback", cback] );
 			}
 			
-			var parsed = parse_url(uri);
-			var realm = parsed['scheme'] + '://' + parsed['host']
-			OAuth.setTimestampAndNonce(message);
-			OAuth.SignatureMethod.sign(message, accessor);
-			var req = y.rest(uri).header("Authorization", OAuth.getAuthorizationHeader(realm, message.parameters));
-
-			try {
-				switch (method) {
-				case 'POST':
-					response.object = req.post().response;
-					break;
-				case 'PUT':
-					response.object = req.put().response;
-					break;
-				case 'DELETE':
-					response.object = req.del().response;
-					break;
-				default:
-					response.object = req.get().response;
-				}
-			} catch(err) {
-				response.object = {
-					'result': 'failure',
-					'error': err
-				};
-			}
+			var request = y.rest( uri );
+			response.object = sendRequest( args );
 
       ]]></execute>
 		</select>
