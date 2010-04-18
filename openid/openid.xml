@@ -69,7 +69,10 @@
 
 					//get auth base url
 					var discoQuery = 'use "{tableUri}" as table; select * from table where normalizedId = "{normalizedId}"'.supplant({
+						
+							//openid.discover.xml
 							'tableUri' : 'store://6KoRrgbEbaLyZ6xK4hjODJ',
+							
 							'normalizedId' : normId
 						});
 					var discoResults = y.query( discoQuery ).results;
