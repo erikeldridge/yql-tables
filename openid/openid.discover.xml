@@ -25,7 +25,7 @@
 				response.object = function() {
 
 					//try yadis
-					var yadisTableUri = 'http://www.datatables.org/openid/openid.yadis.xml';
+					var yadisTableUri = 'store://EyZjOZK9SHXU3IGArp7K58';
 					var yadisQuery = 'use "{tableUri}" as yadis; select * from yadis where uri = "{normalizedId}"'.supplant({
 							'tableUri' : yadisTableUri,
 							'normalizedId' : normalizedId
