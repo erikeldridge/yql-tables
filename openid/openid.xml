@@ -69,7 +69,7 @@
 
 					//get auth base url
 					var discoQuery = 'use "{tableUri}" as table; select * from table where normalizedId = "{normalizedId}"'.supplant({
-							'tableUri' : 'http://github.com/erikeldridge/yql-tables/raw/master/openid/openid.discover.xml',
+							'tableUri' : 'http://www.datatables.org/openid/openid.discover.xml',
 							'normalizedId' : normId
 						});
 					var discoResults = y.query( discoQuery ).results;
