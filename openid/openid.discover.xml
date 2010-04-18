@@ -3,7 +3,7 @@
     <meta>
         <author>Erik Eldridge</author>
         <description>
-            Generate an openid auth url from an identifier (openid 2.0 only, ie is not 1.1 compat)
+            Discovers an openid provider's log-in uri using the normalized openid passed in
         </description>
         <sampleQuery>select * from {table} where normalizedId="http://www.yahoo.com/"</sampleQuery>
 		<documentationURL>http://wiki.github.com/erikeldridge/yql-openid-support/</documentationURL>
